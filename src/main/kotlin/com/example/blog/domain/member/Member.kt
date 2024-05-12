@@ -21,6 +21,12 @@ class Member(
     @Enumerated(EnumType.STRING)
     var roles:Role = role
         protected set
+
+    override fun toString(): String {
+        return "Member(email='$email', password='$password', roles=$roles)"
+    }
+
+
 }
 enum class Role{
     USER,ROLE
