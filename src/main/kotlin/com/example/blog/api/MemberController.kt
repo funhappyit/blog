@@ -17,10 +17,4 @@ class MemberController(
         return CntResDto(HttpStatus.OK,"find All Members",memberService.findAll())
     }
 
-//    fun findAll(): MutableList<Member> {
-//
-//        return memberService.findAll()
-//    }
-
-
 }

@@ -1,6 +1,7 @@
 package com.example.blog.domain.post
 
 import com.example.blog.domain.member.Member
+import com.example.blog.domain.member.MemberRes
 import faker.com.ibm.icu.text.CaseMap.Title
 import org.springframework.boot.autoconfigure.web.WebProperties.Resources.Chain.Strategy.Content
 
@@ -17,3 +18,10 @@ fun PostSaveReq.toEntity(): Post {
         member = Member.createFakeMember(this.memberId)
     )
 }
+
+data class PostRes(
+    val id:Long,
+    val title: String,
+    val content: String,
+    val member:MemberRes
+)

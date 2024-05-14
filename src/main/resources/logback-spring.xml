@@ -1,10 +1,11 @@
 <configuration scan="true" scanPeriod="60 seconds">
 
     <property name="LOGS_PATH" value="./logs"/>
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter" />
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <withJansi>true</withJansi>
         <encoder>
-            <pattern>%red(%d{yyyy-MM-dd HH:mm:ss.SSS}) %green([%thread]) %cyan(%5level) %green(%logger) - %msg%n</pattern>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss.SSS}[%thread] %clr(%5level) %logger - %msg%n</pattern>
         </encoder>
     </appender>
     <appender name="INFO_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
