@@ -1,5 +1,8 @@
 package com.example.blog.domain.member
 
+import jakarta.validation.constraints.NotNull
+
+
 /*
 dto<->entity 간의 매핑할 때, 크게 스타일이 2개 있는거 같더라구요.
 
@@ -8,15 +11,16 @@ dto<->entity 간의 매핑할 때, 크게 스타일이 2개 있는거 같더라�
 
 */
 data class MemberSaveReq(
-    val email:String,
-    val password:String,
-    val role:Role
+    @field:NotNull(message = "require email")
+    val email:String?,
+    val password:String?,
+    val role:Role?
 )
 fun MemberSaveReq.toEntity():Member{
     return Member(
-        email=this.email,
-        password=this.password,
-        role=this.role
+        email=this.email?:"",
+        password=this.password?:"",
+        role=this.role?:Role.USER
     )
 }
 data class MemberRes(
