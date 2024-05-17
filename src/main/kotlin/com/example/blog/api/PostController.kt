@@ -4,6 +4,7 @@ import com.example.blog.domain.member.MemberSaveReq
 import com.example.blog.domain.post.PostSaveReq
 import com.example.blog.service.PostService
 import com.example.blog.util.value.CntResDto
+import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
 import org.springframework.http.HttpStatus
@@ -33,7 +34,7 @@ class PostController(
     }
 
     @PostMapping("/post")
-    fun save(@RequestBody dto: PostSaveReq): CntResDto<*> {
+    fun save(@Valid @RequestBody dto: PostSaveReq): CntResDto<*> {
         return CntResDto(HttpStatus.OK, resultMsg = "save Member",postService.save(dto))
     }
 
