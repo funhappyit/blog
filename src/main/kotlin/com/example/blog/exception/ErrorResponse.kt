@@ -39,13 +39,11 @@ class ErrorResponse(
                 errors = FieldError.of(bindingResult)
             )
         }
-
         fun of(code: ErrorCode): ErrorResponse {
             return ErrorResponse(
                 errorCode = code
             )
         }
-
     }
 
 }

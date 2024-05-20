@@ -38,7 +38,7 @@ dependencies {
     implementation("com.github.gavlyukovskiy:datasource-decorator-spring-boot-autoconfigure:1.9.0")
     implementation("io.github.microutils:kotlin-logging:2.1.23")
     implementation("com.linecorp.kotlin-jdsl:spring-data-kotlin-jdsl-starter-jakarta:2.2.1.RELEASE")
-
+    implementation("org.springframework.boot:spring-boot-starter-aop:2.7.0")
 
     runtimeOnly("com.h2database:h2")
     runtimeOnly("com.mysql:mysql-connector-j")

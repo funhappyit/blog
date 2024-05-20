@@ -2,6 +2,7 @@ package com.example.blog.service
 
 import com.example.blog.domain.member.*
 import com.example.blog.domain.post.*
+import jakarta.persistence.EntityNotFoundException
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
@@ -18,7 +19,13 @@ class PostService(
     }
     @Transactional
     fun save(dto: PostSaveReq): PostRes {
-        return postRepository.save(dto.toEntity()).toDto()
+       // return postRepository.save(dto.toEntity()).toDto()
+        try {
+            return postRepository.save(dto.toEntity()).toDto()
+        } catch (ex: Exception) {
+            // 예외의 종류에 따라 커스텀 예외로 변환
+            throw EntityNotFoundException("Failed to save post")
+        }
     }
 
     @Transactional
