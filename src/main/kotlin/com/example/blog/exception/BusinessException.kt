@@ -1,7 +1,5 @@
 package com.example.blog.exception
 
-import org.springframework.web.client.HttpClientErrorException.NotFound
-
 sealed class BusinessException : RuntimeException {
 
     private var errorCode:ErrorCode

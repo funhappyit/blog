@@ -10,6 +10,7 @@ data class PostSaveReq(
     @field:NotNull(message = "require title")
     val title: String?,
     val content: String?,
+    @field:NotNull(message = "require memberId")
     val memberId:Long?
 )
 

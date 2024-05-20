@@ -31,13 +31,18 @@ class ErrorResponse(
                 }
             }
         }
-
     }
     companion object{
         fun of(code: ErrorCode, bindingResult: BindingResult): ErrorResponse {
             return ErrorResponse(
                 errorCode = code,
                 errors = FieldError.of(bindingResult)
+            )
+        }
+
+        fun of(code: ErrorCode): ErrorResponse {
+            return ErrorResponse(
+                errorCode = code
             )
         }
 
