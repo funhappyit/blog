@@ -1,6 +1,7 @@
 package com.example.blog.domain.member
 
 import com.example.blog.domain.AuditingEntity
+import com.example.blog.domain.post.Post
 import jakarta.persistence.*
 
 @Entity
@@ -21,6 +22,10 @@ class Member(
     @Enumerated(EnumType.STRING)
     var roles:Role = role
         protected set
+
+    @OneToMany(mappedBy = "member", targetEntity = Post::class)
+    var posts = mutableListOf<Post>()
+
 
     override fun toString(): String {
         return "Member(email='$email', password='$password', roles=$roles)"
