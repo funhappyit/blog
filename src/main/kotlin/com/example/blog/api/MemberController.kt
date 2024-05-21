@@ -4,6 +4,7 @@ import com.example.blog.domain.member.Member
 import com.example.blog.domain.member.MemberSaveReq
 import com.example.blog.service.MemberService
 import com.example.blog.util.value.CntResDto
+import jakarta.servlet.http.HttpSession
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
@@ -11,13 +12,15 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.io.Serializable
 
+@RequestMapping("/api")
 @RestController
 class MemberController(
     private val memberService: MemberService
 ) {
 
     @GetMapping("/members")
-    fun findAll(@PageableDefault(size = 10) pageable: Pageable): CntResDto<*>{
+    fun findAll(@PageableDefault(size = 10) pageable: Pageable,session: HttpSession): CntResDto<*>{
+
         return CntResDto(HttpStatus.OK,"find All Members",memberService.findAll(pageable))
     }
 
