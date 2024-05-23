@@ -13,7 +13,7 @@ class UtilTest {
         val jwtManager = JwtManager()
 
         val details = PrincipalDetails(Member.createFakeMember(1))
-        val accessToken = jwtManager.generateToken(details)
+        val accessToken = jwtManager.generateAccessToken(details)
 
         val email = jwtManager.getMemberEmail(accessToken)
 
