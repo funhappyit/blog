@@ -1,6 +1,6 @@
 package com.example.blog.api
 
-import com.example.blog.domain.member.MemberSaveReq
+
 import com.example.blog.domain.post.PostSaveReq
 import com.example.blog.service.PostService
 import com.example.blog.util.value.CntResDto

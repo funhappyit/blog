@@ -1,7 +1,8 @@
 package com.example.blog.api
 
+import com.example.blog.domain.member.LoginDto
 import com.example.blog.domain.member.Member
-import com.example.blog.domain.member.MemberSaveReq
+
 import com.example.blog.service.MemberService
 import com.example.blog.util.value.CntResDto
 import jakarta.servlet.http.HttpSession
@@ -36,7 +37,7 @@ class MemberController(
     }
 
     @PostMapping("/member")
-    fun save(@Valid @RequestBody dto:MemberSaveReq): CntResDto<*> {
+    fun save(@Valid @RequestBody dto:LoginDto): CntResDto<*> {
         return CntResDto(HttpStatus.OK, resultMsg = "save Member",memberService.saveMember(dto))
     }
 

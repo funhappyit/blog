@@ -17,7 +17,7 @@ class JwtManager {
     private val expireTime = 1000*60*60
 
 
-    fun generateToken(principal:PrincipalDetails) {
+    fun generateAccessToken(principal:PrincipalDetails):String {
 
         val sign = JWT.create()
             .withSubject(principal.username)
@@ -25,6 +25,7 @@ class JwtManager {
             .withClaim("email",principal.username)
             .withClaim("password",principal.password)
             .sign(Algorithm.HMAC512(secretKey))
+        return sign
 
     }
 
