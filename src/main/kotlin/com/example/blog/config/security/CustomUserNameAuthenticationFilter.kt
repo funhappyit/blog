@@ -1,18 +1,16 @@
 package com.example.blog.config.security
 
 import com.example.blog.domain.member.LoginDto
-import com.example.blog.domain.member.toEntity
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
-import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.authentication.WebAuthenticationDetailsSource
+
 
 class CustomUserNameAuthenticationFilter(
     private val ob: ObjectMapper
