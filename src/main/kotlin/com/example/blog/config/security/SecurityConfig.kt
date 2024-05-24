@@ -1,5 +1,6 @@
 package com.example.blog.config.security
 
+import com.example.blog.domain.member.MemberRepository
 import com.fasterxml.jackson.databind.ObjectMapper
 import mu.KotlinLogging
 import org.springframework.context.annotation.Bean
@@ -16,6 +17,8 @@ import org.springframework.security.config.annotation.web.configurers.CorsConfig
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
 import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher
@@ -27,7 +30,8 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 @EnableWebSecurity(debug = false)
 class SecurityConfig(
     private val authenticationConfiguration: AuthenticationConfiguration,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val memberRepository: MemberRepository
 ) {
     private val log = KotlinLogging.logger {}
     //@Bean
@@ -46,15 +50,33 @@ class SecurityConfig(
             .sessionManagement{sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
             .cors{cors->cors.configurationSource(corsConfig()) }
             .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
 
         return http.build();
 
     }
 
     @Bean
+    fun authenticationFilter(): CustomBasicAuthenticationFilter {
+
+        return CustomBasicAuthenticationFilter(
+            authenticationManager = authenticationManager(),
+            memberRepository = memberRepository
+        )
+    }
+
+
+    @Bean
     fun authenticationManager(): AuthenticationManager {
         return authenticationConfiguration.authenticationManager
     }
+
+    @Bean
+    fun passwordEncoder(): PasswordEncoder {
+
+        return BCryptPasswordEncoder()
+    }
+
 
     @Bean
     fun loginFilter(): UsernamePasswordAuthenticationFilter {

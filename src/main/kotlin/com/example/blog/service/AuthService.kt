@@ -2,6 +2,7 @@ package com.example.blog.service
 
 import com.example.blog.config.security.PrincipalDetails
 import com.example.blog.domain.member.MemberRepository
+import com.example.blog.exception.MemberNotFoundException
 import mu.KotlinLogging
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -15,10 +16,9 @@ class AuthService(
     val log = KotlinLogging.logger {}
 
     override fun loadUserByUsername(email: String): UserDetails {
-
         log.info { "loadUserByUsername 호출!" }
         val member = memberRepository.findMemberByEmail(email)
-      return PrincipalDetails(member)
+        return PrincipalDetails(member)
     }
 
 }
