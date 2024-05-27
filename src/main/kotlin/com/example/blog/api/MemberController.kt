@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import java.io.Serializable
 
-@RequestMapping("/api")
+@RequestMapping("/v1")
 @RestController
 class MemberController(
     private val memberService: MemberService
