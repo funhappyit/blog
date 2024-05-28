@@ -1,8 +1,6 @@
 package com.example.blog.config.security
 
 import com.example.blog.domain.member.MemberRepository
-import com.example.blog.util.func.responseData
-import com.example.blog.util.value.CntResDto
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -12,16 +10,11 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.authentication.AuthenticationManager
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.builders.WebSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer
-import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
-import org.springframework.security.config.annotation.web.configurers.HttpBasicConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.core.Authentication
 import org.springframework.security.core.AuthenticationException
@@ -33,7 +26,6 @@ import org.springframework.security.web.access.AccessDeniedHandler
 import org.springframework.security.web.authentication.AuthenticationFailureHandler
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
@@ -63,10 +55,11 @@ class SecurityConfig(
             .cors{cors->cors.configurationSource(corsConfig()) }
             .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-           // .exceptionHandling {accessDeniedHandler->accessDeniedHandler.accessDeniedHandler(CustomAccessDeniedHandler())}
+            .exceptionHandling {accessDeniedHandler->accessDeniedHandler.accessDeniedHandler(CustomAccessDeniedHandler())}
             .exceptionHandling { authenticationEntryPoint->authenticationEntryPoint.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper)) }
-            .authorizeHttpRequests{antMatchers->antMatchers.requestMatchers("/**").authenticated()}
-        //.authorizeHttpRequests{antMatchers->antMatchers.anyRequest().permitAll()}
+        //    .authorizeHttpRequests{antMatchers->antMatchers.requestMatchers("/**").authenticated()}
+            .authorizeHttpRequests { antMatchers->antMatchers.requestMatchers("/v1/posts").hasAnyRole("ADMIN","USER") }
+            .authorizeHttpRequests{antMatchers->antMatchers.anyRequest().permitAll()}
 
 
         return http.build();
@@ -81,15 +74,8 @@ class SecurityConfig(
             authException: AuthenticationException?
         ) {
             log.info { "???access denied!!!" }
-            //response.sendError(HttpStatus.UNAUTHORIZED.value(),HttpStatus.UNAUTHORIZED.reasonPhrase)
             response.sendError(HttpStatus.UNAUTHORIZED.value(),HttpStatus.UNAUTHORIZED.reasonPhrase)
-
-
-          //  val cntResDto = CntResDto(HttpStatus.UNAUTHORIZED,"access denied",authException)
-          //  responseData(response, objectMapper.writeValueAsString(cntResDto))
-            //response.sendError(HttpServletResponse.SC_FORBIDDEN)
         }
-
     }
 
 
@@ -164,12 +150,9 @@ class SecurityConfig(
             response: HttpServletResponse,
             authentication: Authentication?
         ) {
-            log.info { "login Success !!!" }
+            log.info { "로그인 성공!!!!!!" }
         }
-
-
     }
-
 
     @Bean
     fun corsConfig(): UrlBasedCorsConfigurationSource {

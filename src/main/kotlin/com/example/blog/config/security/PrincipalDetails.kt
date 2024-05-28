@@ -8,10 +8,10 @@ import org.springframework.security.core.userdetails.UserDetails
 
 class PrincipalDetails(
     member: Member
-):
-UserDetails{
+): UserDetails{
 
-    val member:Member = member
+    var member:Member = member
+        private set
 
 
     private val log = KotlinLogging.logger {  }

@@ -25,7 +25,7 @@ class InitData(
     @EventListener(ApplicationReadyEvent::class)
     private fun init(){
 //        val members = generateMembers(100)
-
+//
 //        memberRepository.saveAll(members)
 //        log.info { "insert: $members" }
 //        val posts= generatePosts(100)

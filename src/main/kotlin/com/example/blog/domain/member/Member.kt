@@ -23,8 +23,8 @@ class Member(
     var roles:Role = role
         protected set
 
-    @OneToMany(mappedBy = "member", targetEntity = Post::class)
-    var posts = mutableListOf<Post>()
+//    @OneToMany(mappedBy = "member", targetEntity = Post::class)
+//    var posts = mutableListOf<Post>()
 
 
     override fun toString(): String {
@@ -51,5 +51,5 @@ fun Member.toDto(): MemberRes {
 }
 
 enum class Role{
-    USER,ROLE
+    USER,ADMIN
 }

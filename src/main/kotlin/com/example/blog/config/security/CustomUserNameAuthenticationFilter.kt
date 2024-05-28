@@ -1,15 +1,19 @@
 package com.example.blog.config.security
 
 import com.example.blog.domain.member.LoginDto
+import com.example.blog.util.func.responseData
+import com.example.blog.util.value.CntResDto
 import com.fasterxml.jackson.databind.ObjectMapper
 
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
+import org.springframework.transaction.annotation.Transactional
 
 
 class CustomUserNameAuthenticationFilter(
@@ -37,15 +41,20 @@ class CustomUserNameAuthenticationFilter(
     }
 
     override fun successfulAuthentication(
-        request: HttpServletRequest?,
-        response: HttpServletResponse?,
-        chain: FilterChain?,
-        authResult: Authentication?
+        request: HttpServletRequest,
+        response: HttpServletResponse,
+        chain: FilterChain,
+        authResult: Authentication
     ){
         log.info { "로그인 완료되어서 JWT 토큰 만들어서 response" }
-        val princopalDetails = authResult?.principal as PrincipalDetails
-        val jwtToken = jwtManager.generateAccessToken(princopalDetails)
-        response?.addHeader(jwtManager.jwtHeader, "Bearer $jwtToken")
+        val prinpalDetails = authResult?.principal as PrincipalDetails
+        val jwtToken = jwtManager.generateAccessToken(prinpalDetails)
+        response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+jwtToken)
+        println(prinpalDetails)
+
+       val jsonResult = ob.writeValueAsString(CntResDto(HttpStatus.OK,"login success",prinpalDetails))
+
+       responseData(response,jsonResult)
 
     }
 
