@@ -48,7 +48,7 @@ class CustomUserNameAuthenticationFilter(
     ){
         log.info { "로그인 완료되어서 JWT 토큰 만들어서 response" }
         val prinpalDetails = authResult?.principal as PrincipalDetails
-        val jwtToken = jwtManager.generateAccessToken(prinpalDetails)
+        val jwtToken = jwtManager.generateAccessToken(ob.writeValueAsString(prinpalDetails))
         response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+jwtToken)
         println(prinpalDetails)
 
@@ -57,7 +57,4 @@ class CustomUserNameAuthenticationFilter(
        responseData(response,jsonResult)
 
     }
-
-
-
 }
