@@ -21,8 +21,13 @@
             <maxHistory>180</maxHistory>
         </rollingPolicy>
     </appender>
-    <root level="debug">
+    <root level="info">
         <appender-ref ref="STDOUT" />
         <appender-ref ref="INFO_LOG" />
     </root>
+
+    <logger name="com.example.blog" level="debug" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
 </configuration>

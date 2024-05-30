@@ -1,6 +1,7 @@
 package com.example.blog.config.security
 
 import com.example.blog.domain.member.MemberRepository
+import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
@@ -13,6 +14,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 class CustomBasicAuthenticationFilter(
     private val memberRepository: MemberRepository,
+    private val om:ObjectMapper,
     authenticationManager: AuthenticationManager
 ): BasicAuthenticationFilter(authenticationManager) {
 
@@ -23,7 +25,7 @@ class CustomBasicAuthenticationFilter(
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
        log.info { "권한이나 인증이 필요한 요청이 들어옴" }
 
-        val token = request.getHeader(jwtManager.jwtHeader).replace("Bearer ","")
+        val token = request.getHeader(jwtManager.authorizationHeader).replace("Bearer ","")
 
         if(token == null || token == "") {
             log.info{"token이 없습니다"}
@@ -33,10 +35,15 @@ class CustomBasicAuthenticationFilter(
 
         log.debug { "token: $token" }
 
-        val memberEmail = jwtManager.getMemberEmail(token) ?:throw RuntimeException("memberEmail을 찾을 수 없습니다")
-        val member = memberRepository.findMemberByEmail(memberEmail)
+        //val memberEmail = jwtManager.getMemberEmail(token) ?:throw RuntimeException("memberEmail을 찾을 수 없습니다")
+        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(token) ?:throw RuntimeException("memberEmail을 찾을 수 없습니다")
 
-        val principalDetails = PrincipalDetails(member)
+        val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
+
+        //DB로 호출하잖아요.
+        //val member = memberRepository.findMemberByEmail(details.member.email)
+
+       // val principalDetails = PrincipalDetails(member)
 
         val authentication:Authentication =
         UsernamePasswordAuthenticationToken(

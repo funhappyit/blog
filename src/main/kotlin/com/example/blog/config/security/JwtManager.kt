@@ -30,14 +30,13 @@ class JwtManager(
 
     fun generateAccessToken(principal:String):String {
 
-        val expireDate = Date(System.nanoTime()+ TimeUnit.MINUTES.toMillis(accessTokenExpireSecond));
+        val expireDate = Date(System.currentTimeMillis()+ TimeUnit.SECONDS.toMillis(accessTokenExpireSecond));
 
         log.info{"accessToken ExpireDate=>$expireDate"}
 
         val sign = JWT.create()
             .withSubject(jwtSubject)
             .withExpiresAt(expireDate)
-          //  .withClaim("email",principal.username)
             .withClaim(claimPrincipal,principal)
             .sign(Algorithm.HMAC512(secretKey))
         return sign
@@ -47,6 +46,13 @@ class JwtManager(
     fun getMemberEmail(token:String) : String? {
         return JWT.require(Algorithm.HMAC512(secretKey)).build().verify(token).getClaim("email").asString()
     }
+
+    fun getPrincipalStringByAccessToken(accessToken:String) : String? {
+        val decodedJWT = validatedJwt(accessToken)
+        val principalString = decodedJWT.getClaim("principal").asString()
+        return principalString
+    }
+
 
     fun validatedJwt(accessToken:String): DecodedJWT {
         try{

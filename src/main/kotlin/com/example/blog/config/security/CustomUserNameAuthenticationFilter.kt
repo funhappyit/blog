@@ -25,11 +25,11 @@ class CustomUserNameAuthenticationFilter(
 
     override fun attemptAuthentication(request: HttpServletRequest?, response: HttpServletResponse?): Authentication {
 
-        log.info { "login 요청중" }
+        log.debug { "login 요청중" }
         lateinit var loginDto:LoginDto
         try{
             loginDto =  ob.readValue(request?.inputStream, LoginDto::class.java)
-            log.info{"login Dto: $loginDto "}
+            log.debug{"login Dto: $loginDto "}
         }catch(ex: Exception){
             log.error("loginFilter : 로그인 요청 Dto 생성 중 실패 ! $ex")
         }

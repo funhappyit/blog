@@ -9,6 +9,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import mu.KotlinLogging
 import org.junit.jupiter.api.Test
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
+import kotlin.jvm.Throws
 
 class UtilTest {
     val log = KotlinLogging.logger {}
@@ -18,11 +19,14 @@ class UtilTest {
     fun generateJwtTest(){
         mapper.registerModule(JavaTimeModule())
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES,false)
-        val jwtManager = JwtManager(accessTokenExpireSecond = 60)
+        val jwtManager = JwtManager(accessTokenExpireSecond = 1)
 
         val details = PrincipalDetails(Member.createFakeMember(1))
         val jsonPrincipal = mapper.writeValueAsString(details)
         val accessToken = jwtManager.generateAccessToken(jsonPrincipal)
+
+        Thread.sleep(6000)
+
         val decodedJWT = jwtManager.validatedJwt(accessToken)
         val principalString = decodedJWT.getClaim(jwtManager.claimPrincipal).asString()
         val principalDetails:PrincipalDetails =  mapper.readValue(principalString, PrincipalDetails::class.java)
