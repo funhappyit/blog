@@ -1,6 +1,7 @@
 package com.example.blog.domain.member
 
 import jakarta.validation.constraints.NotNull
+import java.time.LocalDateTime
 
 
 /*
@@ -27,5 +28,8 @@ data class MemberRes(
     val id:Long,
     val email: String,
     val password: String,
-    val role: Role
+    val role: Role,
+    val createAt:LocalDateTime,
+    val updateAt:LocalDateTime
+
 )

@@ -24,12 +24,20 @@ class Member(
     var roles:Role = role
         protected set
 
-//    @OneToMany(mappedBy = "member", targetEntity = Post::class)
-//    var posts = mutableListOf<Post>()
+    fun toDto(): MemberRes {
+        return MemberRes(
+            id = this.id!!,
+            email = this.email,
+            password = this.password,
+            role = this.roles,
+            createAt = this.createAt,
+            updateAt = this.updateAt
+        )
+    }
 
 
     override fun toString(): String {
-        return "Member(email='$email', password='$password', roles=$roles)"
+        return "Member(email='$email', password='$password', roles='$roles', createAt='$createAt')"
     }
 
     companion object{
@@ -41,14 +49,7 @@ class Member(
 
 
 }
-fun Member.toDto(): MemberRes {
-    return MemberRes(
-        id = this.id!!,
-        email = this.email,
-        password = this.password,
-       role = this.roles
-    )
-}
+
 
 enum class Role{
     USER,ADMIN

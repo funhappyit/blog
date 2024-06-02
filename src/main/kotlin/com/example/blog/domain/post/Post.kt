@@ -2,7 +2,7 @@ package com.example.blog.domain.post
 
 import com.example.blog.domain.AuditingEntity
 import com.example.blog.domain.member.Member
-import com.example.blog.domain.member.toDto
+
 import jakarta.persistence.*
 
 @Entity

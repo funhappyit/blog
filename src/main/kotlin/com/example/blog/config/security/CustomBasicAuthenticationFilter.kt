@@ -14,7 +14,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 class CustomBasicAuthenticationFilter(
     private val memberRepository: MemberRepository,
-    private val om:ObjectMapper,
+    private val om: ObjectMapper,
     authenticationManager: AuthenticationManager
 ): BasicAuthenticationFilter(authenticationManager) {
 
@@ -44,6 +44,7 @@ class CustomBasicAuthenticationFilter(
         //val member = memberRepository.findMemberByEmail(details.member.email)
 
        // val principalDetails = PrincipalDetails(member)
+
 
         val authentication:Authentication =
         UsernamePasswordAuthenticationToken(

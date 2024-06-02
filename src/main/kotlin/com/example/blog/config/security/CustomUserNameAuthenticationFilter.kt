@@ -1,6 +1,7 @@
 package com.example.blog.config.security
 
 import com.example.blog.domain.member.LoginDto
+import com.example.blog.util.CookieProvider
 import com.example.blog.util.func.responseData
 import com.example.blog.util.value.CntResDto
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -9,11 +10,13 @@ import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
 import mu.KotlinLogging
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.transaction.annotation.Transactional
+import java.util.concurrent.TimeUnit
 
 
 class CustomUserNameAuthenticationFilter(
@@ -48,11 +51,17 @@ class CustomUserNameAuthenticationFilter(
     ){
         log.info { "로그인 완료되어서 JWT 토큰 만들어서 response" }
         val prinpalDetails = authResult?.principal as PrincipalDetails
-        val jwtToken = jwtManager.generateAccessToken(ob.writeValueAsString(prinpalDetails))
-        response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+jwtToken)
-        println(prinpalDetails)
+        val accessToken = jwtManager.generateAccessToken(ob.writeValueAsString(prinpalDetails))
+        val refreshToken = jwtManager.generateRefreshToken(ob.writeValueAsString(prinpalDetails))
 
-       val jsonResult = ob.writeValueAsString(CntResDto(HttpStatus.OK,"login success",prinpalDetails))
+        val refreshCookie = CookieProvider.createCookie(
+            "refreshCookie",
+            refreshToken,TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay)
+        )
+        response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+accessToken)
+        response.addHeader(HttpHeaders.SET_COOKIE,refreshCookie.toString())
+
+       val jsonResult = ob.writeValueAsString(CntResDto(HttpStatus.OK,"login success",prinpalDetails.member))
 
        responseData(response,jsonResult)
 
