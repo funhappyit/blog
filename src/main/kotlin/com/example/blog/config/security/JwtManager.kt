@@ -84,38 +84,53 @@ class JwtManager(
         return principalString
     }
 
+    /*
+    Kotlin에서 unionType이란 게
+    String:Int
+    */
 
-    fun validatedJwt(token:String, req:HttpServletRequest?=null): DecodedJWT {
+    // jwt 유효한지 확인
+    fun validatedJwt(token:String): DecodedJWT {
         try{
             val verifier: JWTVerifier = JWT.require(Algorithm.HMAC512(accessSecretKey)).build()
             val jwt: DecodedJWT = verifier.verify(token)
            return jwt
         } catch(e:JWTVerificationException){
             log.error("error=>${e.stackTraceToString()}")
-
-            if(e is TokenExpiredException){
-                val refreshToken = CookieProvider.getCookie(req!!,"refreshCookie").orElseThrow()
-                val validatedJwt = validatedJwt(refreshToken)
-
-                val principalString = getPrincipalStringByAccessToken(refreshToken)
-
-                val principalDetails = ObjectMapper().readValue(principalString,PrincipalDetails::class.java )
-
-                //요거 문제였다
-                val authentication: Authentication =
-                    UsernamePasswordAuthenticationToken(
-                        principalDetails,
-                        principalDetails.password,
-                        principalDetails.authorities
-                    )
-                SecurityContextHolder.getContext().authentication = authentication //인증 처리 끝
-
-            }
-
+            /*
+             우리가 이미 발급한 refreshToken(쿠리로 감싸져있음) 이걸 꺼내가지고 요걸 토대로 다시 accessToken을 발급하는거에요
+            */
             throw e
 
         }
     }
 
+    private fun reissueAccessToken(
+        e: JWTVerificationException,
+        req: HttpServletRequest?
+    ) {
+        if (e is TokenExpiredException) {
+            val refreshToken = CookieProvider.getCookie(req!!, "refreshCookie").orElseThrow()
+            val validatedJwt = validatedJwt(refreshToken)
 
+            val principalString = getPrincipalStringByAccessToken(refreshToken)
+
+            val principalDetails = ObjectMapper().readValue(principalString, PrincipalDetails::class.java)
+
+            //요거 문제였다
+            val authentication: Authentication =
+                UsernamePasswordAuthenticationToken(
+                    principalDetails,
+                    principalDetails.password,
+                    principalDetails.authorities
+                )
+            SecurityContextHolder.getContext().authentication = authentication //인증 처리 끝
+        }
+    }
 }
+
+sealed class TokenValidResult{
+    class Success(val value:Boolean = false): TokenValidResult()
+    class Failure(val value:JWTVerificationException): TokenValidResult()
+}
+
