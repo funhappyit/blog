@@ -1,6 +1,9 @@
 package com.example.blog.config.security
 
+import com.auth0.jwt.exceptions.JWTVerificationException
+import com.auth0.jwt.exceptions.TokenExpiredException
 import com.example.blog.domain.member.MemberRepository
+import com.example.blog.util.CookieProvider
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.FilterChain
 import jakarta.servlet.http.HttpServletRequest
@@ -53,7 +56,30 @@ class CustomBasicAuthenticationFilter(
             principalDetails.authorities
         )
         SecurityContextHolder.getContext().authentication = authentication
-
         chain.doFilter(request, response)
     }
+
+//    private fun reissueAccessToken(
+//        e: JWTVerificationException,
+//        req: HttpServletRequest?
+//    ) {
+//        if (e is TokenExpiredException) {
+//            val refreshToken = CookieProvider.getCookie(req!!, "refreshCookie").orElseThrow()
+//            val validatedJwt = validatedJwt(refreshToken)
+//
+//            val principalString = getPrincipalStringByAccessToken(refreshToken)
+//
+//            val principalDetails = ObjectMapper().readValue(principalString, PrincipalDetails::class.java)
+//
+//            //요거 문제였다
+//            val authentication: Authentication =
+//                UsernamePasswordAuthenticationToken(
+//                    principalDetails,
+//                    principalDetails.password,
+//                    principalDetails.authorities
+//                )
+//            SecurityContextHolder.getContext().authentication = authentication //인증 처리 끝
+//        }
+//    }
+
 }
