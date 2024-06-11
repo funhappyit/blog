@@ -1,6 +1,5 @@
 package com.example.blog.config.security
 
-import com.auth0.jwt.exceptions.JWTVerificationException
 import com.auth0.jwt.exceptions.TokenExpiredException
 import com.example.blog.domain.member.MemberRepository
 import com.example.blog.util.CookieProvider
@@ -41,9 +40,37 @@ class CustomBasicAuthenticationFilter(
         val accessTokenResult: TokenValidResult = jwtManager.validAccessToken(accessToken)
 
         if(accessTokenResult is TokenValidResult.Failure) {
-
             if(accessTokenResult.exception is TokenExpiredException){
-                log.info{"getClass=====>${accessTokenResult.javaClass}"}
+
+                log.info{"getClass=====>${accessTokenResult.exception.javaClass}"}
+
+                val refreshToken = CookieProvider.getCookie(request, CookieProvider.CookieName.REFRESH_COOKIE).orElseThrow()
+                val refreshTokenResult = jwtManager.validRefreshToken(refreshToken)
+
+                if(accessTokenResult is TokenValidResult.Failure) {
+                    throw RuntimeException("Invalid refreshToken")
+                }
+
+
+
+
+                val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
+                val details = om.readValue(principalString, PrincipalDetails::class.java)
+
+                val accessToken = jwtManager.generateAccessToken(om.writeValueAsString(details))
+                response?.addHeader(jwtManager.authorizationHeader,jwtManager.jwtHeader+accessToken)
+
+                val authentication:Authentication =
+                    UsernamePasswordAuthenticationToken(
+                        details,
+                        details.password,
+                        details.authorities
+                    )
+                SecurityContextHolder.getContext().authentication = authentication
+                chain.doFilter(request, response)
+
+
+                return
             }else{
                 log.error{accessTokenResult.exception.stackTraceToString()}
             }
@@ -75,27 +102,5 @@ class CustomBasicAuthenticationFilter(
         chain.doFilter(request, response)
     }
 
-//    private fun reissueAccessToken(
-//        e: JWTVerificationException,
-//        req: HttpServletRequest?
-//    ) {
-//        if (e is TokenExpiredException) {
-//            val refreshToken = CookieProvider.getCookie(req!!, "refreshCookie").orElseThrow()
-//            val validatedJwt = validatedJwt(refreshToken)
-//
-//            val principalString = getPrincipalStringByAccessToken(refreshToken)
-//
-//            val principalDetails = ObjectMapper().readValue(principalString, PrincipalDetails::class.java)
-//
-//            //요거 문제였다
-//            val authentication: Authentication =
-//                UsernamePasswordAuthenticationToken(
-//                    principalDetails,
-//                    principalDetails.password,
-//                    principalDetails.authorities
-//                )
-//            SecurityContextHolder.getContext().authentication = authentication //인증 처리 끝
-//        }
-//    }
 
 }

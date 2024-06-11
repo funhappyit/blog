@@ -12,9 +12,9 @@ object CookieProvider {
         TODO()
     }
 
-    fun createCookie(cookieName: String,value:String,maxAge:Long){
+    fun createCookie(cookieName: CookieName,value:String,maxAge:Long){
 
-        ResponseCookie.from(cookieName,value)
+        ResponseCookie.from(cookieName.name,value)
             .httpOnly(true)
             .secure(false) // http 허용
             .path("/")
@@ -23,9 +23,9 @@ object CookieProvider {
 
     }
 
-    fun getCookie(req:HttpServletRequest,cookieName: String): Optional<String> {
+    fun getCookie(req:HttpServletRequest, cookieName: CookieName): Optional<String> {
         val cookieValue = req.cookies.filter { cookie->
-            cookie.name == cookieName
+            cookie.name == cookieName.name
         }.map{ cookie->
             cookie.value
         }.firstOrNull()
@@ -34,4 +34,11 @@ object CookieProvider {
 
         return Optional.ofNullable(cookieValue)
     }
+
+    enum class CookieName(
+        val info:String
+    ){
+        REFRESH_COOKIE("refresh-cookie"),
+    }
+
 }

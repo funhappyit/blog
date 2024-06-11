@@ -55,7 +55,7 @@ class CustomUserNameAuthenticationFilter(
         val refreshToken = jwtManager.generateRefreshToken(ob.writeValueAsString(prinpalDetails))
 
         val refreshCookie = CookieProvider.createCookie(
-            "refreshCookie",
+            CookieProvider.CookieName.REFRESH_COOKIE,
             refreshToken,TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay)
         )
         response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+accessToken)
