@@ -28,18 +28,34 @@ class CustomBasicAuthenticationFilter(
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, chain: FilterChain) {
        log.info { "권한이나 인증이 필요한 요청이 들어옴" }
 
-        val token = request.getHeader(jwtManager.authorizationHeader).replace("Bearer ","")
+        val accessToken = request.getHeader(jwtManager.authorizationHeader).replace("Bearer ","")
 
-        if(token == null || token == "") {
+        if(accessToken == null || accessToken == "") {
             log.info{"token이 없습니다"}
             chain.doFilter(request, response)
             return
         }
 
-        log.debug { "token: $token" }
+        log.debug { "access token: $accessToken" }
+
+        val accessTokenResult: TokenValidResult = jwtManager.validAccessToken(accessToken)
+
+        if(accessTokenResult is TokenValidResult.Failure) {
+
+            if(accessTokenResult.exception is TokenExpiredException){
+                log.info{"getClass=====>${accessTokenResult.javaClass}"}
+            }else{
+                log.error{accessTokenResult.exception.stackTraceToString()}
+            }
+
+        }
 
         //val memberEmail = jwtManager.getMemberEmail(token) ?:throw RuntimeException("memberEmail을 찾을 수 없습니다")
-        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(token) ?:throw RuntimeException("memberEmail을 찾을 수 없습니다")
+        val principalJsonData = jwtManager.getPrincipalStringByAccessToken(accessToken)
+
+
+
+
 
         val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
 

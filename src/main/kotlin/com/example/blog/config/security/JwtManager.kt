@@ -78,14 +78,39 @@ class JwtManager(
         return JWT.require(Algorithm.HMAC512(accessSecretKey)).build().verify(token).getClaim("email").asString()
     }
 
-    fun getPrincipalStringByAccessToken(accessToken:String) : String? {
-        val tokenResult = validatedJwt(accessToken)
+    fun getPrincipalStringByAccessToken(accessToken:String) : String{
+        val decodedJWT = getDecodeJwt(accessSecretKey,accessToken)
 
-        if(tokenResult.isValid){
-            return tokenResult.decodeJWT?.getClaim(claimPrincipal)?.toString()?:throw RuntimeException("")
-        }
-        return ""
+
+        return decodedJWT.getClaim(claimPrincipal).asString()
     }
+
+    fun getPrincipalStringByRefreshToken(refreshToken:String) : String{
+        val decodedJWT = getDecodeJwt(refreshSecretKey,refreshToken)
+
+        return decodedJWT.getClaim(claimPrincipal).asString()
+    }
+
+
+
+    private fun getDecodeJwt(secretKey: String,token: String):DecodedJWT{
+        val verifier: JWTVerifier = JWT.require(Algorithm.HMAC512(secretKey)).build()
+        val decodeJWT: DecodedJWT = verifier.verify(token)
+        return decodeJWT
+    }
+
+
+    fun validAccessToken(token:String): TokenValidResult {
+
+        return validatedJwt(token,accessSecretKey)
+    }
+
+    fun validRefreshToken(token:String): TokenValidResult {
+
+        return validatedJwt(token,refreshSecretKey)
+    }
+
+
 
     /*
     Kotlin에서 unionType이란 게
@@ -93,15 +118,16 @@ class JwtManager(
     */
 
     // jwt 유효한지 확인
-    fun validatedJwt(token:String): TokenValidResult {
-        try{
-            val verifier: JWTVerifier = JWT.require(Algorithm.HMAC512(accessSecretKey)).build()
-            val decodeJWT: DecodedJWT = verifier.verify(token)
-           return TokenValidResult(isValid = true, decodeJWT = decodeJWT)
+    private fun validatedJwt(token:String,secretKey: String): TokenValidResult {// TRUE : JWTVerificationException
+        return try{
+            getDecodeJwt(secretKey,token)
+           //return TokenValidResult(isValid = true, decodeJWT = decodeJWT)
+            TokenValidResult.Success()
         } catch(e:JWTVerificationException){
             log.error("error=>${e.stackTraceToString()}")
 
-            return TokenValidResult(isValid = false, exception = e)
+           // return TokenValidResult(isValid = false, exception = e)
+            TokenValidResult.Failure(e)
 
         }
     }
@@ -114,16 +140,16 @@ class JwtManager(
 코틀린으로 unit type 흉내
 */
 
-//sealed class TokenValidResult{
-//    class Success(val value:Boolean = true, val decodedJwt:DecodedJWT): TokenValidResult()
-//    class Failure(val value:JWTVerificationException): TokenValidResult()
-//}
-
-class TokenValidResult(
-    val isValid:Boolean,
-    val exception: JWTVerificationException? = null,
-    val decodeJWT: DecodedJWT? = null
-){
-
-
+sealed class TokenValidResult{
+    class Success(val successValue:Boolean = true): TokenValidResult()
+    class Failure(val exception: JWTVerificationException): TokenValidResult()
 }
+
+//class TokenValidResult(
+//    val isValid:Boolean,
+//    val exception: JWTVerificationException? = null,
+//    val decodeJWT: DecodedJWT? = null
+//){
+//
+//
+//}
