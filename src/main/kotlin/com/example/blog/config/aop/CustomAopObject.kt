@@ -21,8 +21,6 @@ object CustomAopObject {
         func()
         log.info { "after" }
     }
-
-
 }
 
 fun main(){

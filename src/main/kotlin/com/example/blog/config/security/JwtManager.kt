@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 import javax.crypto.SecretKey
 
 class JwtManager(
-    accessTokenExpireSecond:Long = 30, //1분
+    accessTokenExpireSecond:Long = 1, //1분
     refreshTokenExpireDay:Long = 7
 ) {
 
