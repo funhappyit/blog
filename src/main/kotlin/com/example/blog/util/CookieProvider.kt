@@ -12,9 +12,9 @@ object CookieProvider {
         TODO()
     }
 
-    fun createCookie(cookieName: CookieName,value:String,maxAge:Long){
+    fun createCookie(cookieName: CookieName,value:String,maxAge:Long): ResponseCookie {
 
-        ResponseCookie.from(cookieName.name,value)
+        return ResponseCookie.from(cookieName.name,value)
             .httpOnly(true)
             .secure(false) // http 허용
             .path("/")

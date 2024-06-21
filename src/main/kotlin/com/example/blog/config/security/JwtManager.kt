@@ -45,7 +45,7 @@ class JwtManager(
 
         log.info{"refreshToken ExpireDate=>$expireDate"}
 
-        return doGenerateToken(expireDate,principal,accessSecretKey)
+        return doGenerateToken(expireDate,principal,refreshSecretKey)
     }
 
     private fun doGenerateToken(

@@ -7,4 +7,10 @@ import org.springframework.web.bind.annotation.RestController
 class TestController() {
     @GetMapping("/health")
     fun healthTest():String = "hello blog"
+
+    @GetMapping("/error") //시큐리티 default
+    fun errorTest(): String{
+        return "error"
+    }
+
 }

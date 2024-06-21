@@ -55,7 +55,7 @@ class CustomBasicAuthenticationFilter(
                 reissueAccessToken(details, response)
                 setAuthentication(details, chain, request, response)
             }
-
+            return
         }
         val principalJsonData = jwtManager.getPrincipalStringByAccessToken(accessToken)
         val principalDetails = om.readValue(principalJsonData, PrincipalDetails::class.java)
@@ -91,7 +91,10 @@ class CustomBasicAuthenticationFilter(
     private fun handleTokenException(tokenValidResult: TokenValidResult.Failure, func:()->Unit){
             when(tokenValidResult.exception){
                 is TokenExpiredException -> func()
-                else -> log.error(tokenValidResult.exception.stackTraceToString())
+                else -> {
+                    log.error(tokenValidResult.exception.stackTraceToString())
+                    throw tokenValidResult.exception
+                }
             }
     }
 
