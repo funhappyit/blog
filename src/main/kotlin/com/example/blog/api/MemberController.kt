@@ -21,13 +21,11 @@ class MemberController(
 
     @GetMapping("/members")
     fun findAll(@PageableDefault(size = 10) pageable: Pageable,session: HttpSession): CntResDto<*>{
-
         return CntResDto(HttpStatus.OK,"find All Members",memberService.findAll(pageable))
     }
 
     @GetMapping("/member/{id}")
     fun findById(@PathVariable("id") id:Long): CntResDto<Any>{
-
         return CntResDto(HttpStatus.OK,"find Member by id",memberService.findMemberById(id))
     }
 
@@ -36,9 +34,6 @@ class MemberController(
         return CntResDto(HttpStatus.OK,"delete Member by id",memberService.deleteMember(id))
     }
 
-    @PostMapping("/member")
-    fun save(@Valid @RequestBody dto:LoginDto): CntResDto<*> {
-        return CntResDto(HttpStatus.OK, resultMsg = "save Member",memberService.saveMember(dto))
-    }
+
 
 }

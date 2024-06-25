@@ -1,5 +1,7 @@
 package com.example.blog.config.security
 
+import com.example.blog.domain.HashMapRepositoryImpl
+import com.example.blog.domain.InMemoryRepository
 import com.example.blog.domain.member.MemberRepository
 import com.example.blog.util.func.responseData
 import com.example.blog.util.value.CntResDto
@@ -52,23 +54,23 @@ class SecurityConfig(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf{csrf->csrf.disable()}
+        http.csrf { csrf -> csrf.disable() }
             .headers { headers -> headers
                 .frameOptions { frameOptions -> frameOptions.disable() }
             }
-            .formLogin { formLogin->formLogin.disable() }
-            .httpBasic { httpBasic->httpBasic.disable() }
-            .sessionManagement{sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS)}
-            .cors{cors->cors.configurationSource(corsConfig()) }
+            .formLogin { formLogin -> formLogin.disable() }
+            .httpBasic { httpBasic -> httpBasic.disable() }
+            .sessionManagement { sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .cors { cors -> cors.configurationSource(corsConfig()) }
             .addFilterBefore(loginFilter(), UsernamePasswordAuthenticationFilter::class.java)
             .addFilterBefore(authenticationFilter(), UsernamePasswordAuthenticationFilter::class.java)
-            .exceptionHandling {accessDeniedHandler->accessDeniedHandler.accessDeniedHandler(CustomAccessDeniedHandler())}
-            .exceptionHandling { authenticationEntryPoint->authenticationEntryPoint.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper)) }
+            .exceptionHandling { accessDeniedHandler -> accessDeniedHandler.accessDeniedHandler(CustomAccessDeniedHandler()) }
+            .exceptionHandling { authenticationEntryPoint -> authenticationEntryPoint.authenticationEntryPoint(CustomAuthenticationEntryPoint(objectMapper)) }
         //    .authorizeHttpRequests{antMatchers->antMatchers.requestMatchers("/**").authenticated()}
-            .authorizeHttpRequests { antMatchers->antMatchers.requestMatchers("/v1/posts").hasAnyRole("ADMIN","USER") }
+            .authorizeHttpRequests { antMatchers -> antMatchers.requestMatchers("/v1/posts").hasAnyRole("ADMIN", "USER") }
             .authorizeHttpRequests{antMatchers->antMatchers.anyRequest().permitAll()}
-            .logout { logoutSuccessHandler->logoutSuccessHandler.logoutSuccessHandler(CustomLogoutSuccessHandler(objectMapper)) }
-            .logout { logout->logout.logoutUrl("/logout")}
+            .logout { logoutSuccessHandler -> logoutSuccessHandler.logoutSuccessHandler(CustomLogoutSuccessHandler(objectMapper)) }
+            .logout { logout -> logout.logoutUrl("/logout") }
 
         return http.build();
     }
@@ -130,6 +132,14 @@ class SecurityConfig(
     }
 
     @Bean
+    fun inmemoryRepository(): InMemoryRepository {
+
+        return HashMapRepositoryImpl()
+    }
+
+
+
+    @Bean
     fun authenticationFilter(): CustomBasicAuthenticationFilter {
 
         return CustomBasicAuthenticationFilter(
@@ -146,7 +156,7 @@ class SecurityConfig(
     }
 
     @Bean
-    fun passwordEncoder(): PasswordEncoder {
+    fun passwordEncoder(): BCryptPasswordEncoder {
 
         return BCryptPasswordEncoder()
     }
@@ -155,7 +165,7 @@ class SecurityConfig(
     @Bean
     fun loginFilter(): UsernamePasswordAuthenticationFilter {
 
-        val authenticationFilter = CustomUserNameAuthenticationFilter(objectMapper)
+        val authenticationFilter = CustomUserNameAuthenticationFilter(objectMapper,inmemoryRepository())
         authenticationFilter.setAuthenticationManager(authenticationManager())
         authenticationFilter.setFilterProcessesUrl("/login")
         authenticationFilter.setAuthenticationFailureHandler(CustomFailureHandler())

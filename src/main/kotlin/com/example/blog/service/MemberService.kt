@@ -21,12 +21,7 @@ class MemberService(
             it.toDto()
         }
 
-    @Transactional
-    fun saveMember(dto: LoginDto): MemberRes {
 
-        return memberRepository.save(dto.toEntity()).toDto()
-
-    }
 
     @Transactional
     fun deleteMember(id:Long){

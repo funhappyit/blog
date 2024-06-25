@@ -80,8 +80,6 @@ class JwtManager(
 
     fun getPrincipalStringByAccessToken(accessToken:String) : String{
         val decodedJWT = getDecodeJwt(accessSecretKey,accessToken)
-
-
         return decodedJWT.getClaim(claimPrincipal).asString()
     }
 

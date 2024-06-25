@@ -1,5 +1,7 @@
 package com.example.blog.config.security
 
+import com.example.blog.domain.HashMapRepositoryImpl
+import com.example.blog.domain.InMemoryRepository
 import com.example.blog.domain.member.LoginDto
 import com.example.blog.util.CookieProvider
 import com.example.blog.util.func.responseData
@@ -20,7 +22,8 @@ import java.util.concurrent.TimeUnit
 
 
 class CustomUserNameAuthenticationFilter(
-    private val ob: ObjectMapper
+    private val ob: ObjectMapper,
+    private val memoryRepository: InMemoryRepository,
 ): UsernamePasswordAuthenticationFilter() {
     private val log = KotlinLogging.logger {}
 
@@ -38,7 +41,7 @@ class CustomUserNameAuthenticationFilter(
         }
 
 
-       val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email,loginDto.password)
+       val authenticationToken = UsernamePasswordAuthenticationToken(loginDto.email,loginDto.rawPassword)
 
         return this.authenticationManager.authenticate(authenticationToken)
     }
@@ -59,8 +62,12 @@ class CustomUserNameAuthenticationFilter(
             refreshToken,
             TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay)
         )
+
         response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+accessToken)
         response.addHeader(HttpHeaders.SET_COOKIE,refreshCookie.toString())
+
+        memoryRepository.save(refreshToken,prinpalDetails)
+
 
        val jsonResult = ob.writeValueAsString(CntResDto(HttpStatus.OK,"login success",prinpalDetails.member))
 

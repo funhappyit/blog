@@ -24,7 +24,6 @@ class PostController(
 
     @GetMapping("/post/{id}")
     fun findById(@PathVariable("id") id:Long): CntResDto<Any>{
-
         return CntResDto(HttpStatus.OK,"find Post by id",postService.findById(id))
     }
 
