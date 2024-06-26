@@ -133,7 +133,6 @@ class SecurityConfig(
 
     @Bean
     fun inmemoryRepository(): InMemoryRepository {
-
         return HashMapRepositoryImpl()
     }
 
@@ -145,7 +144,8 @@ class SecurityConfig(
         return CustomBasicAuthenticationFilter(
             authenticationManager = authenticationManager(),
             memberRepository = memberRepository,
-            om = objectMapper
+            om = objectMapper,
+            memoryRepository = inmemoryRepository()
         )
     }
 

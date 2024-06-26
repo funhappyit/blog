@@ -26,8 +26,9 @@ class CustomUserNameAuthenticationFilter(
     private val memoryRepository: InMemoryRepository,
 ): UsernamePasswordAuthenticationFilter() {
     private val log = KotlinLogging.logger {}
-
     private val jwtManager = JwtManager()
+
+
 
     override fun attemptAuthentication(request: HttpServletRequest?, response: HttpServletResponse?): Authentication {
 
@@ -63,15 +64,13 @@ class CustomUserNameAuthenticationFilter(
             TimeUnit.DAYS.toSeconds(jwtManager.refreshTokenExpireDay)
         )
 
+
         response?.addHeader(jwtManager.authorizationHeader, jwtManager.jwtHeader+accessToken)
         response.addHeader(HttpHeaders.SET_COOKIE,refreshCookie.toString())
-
         memoryRepository.save(refreshToken,prinpalDetails)
 
 
        val jsonResult = ob.writeValueAsString(CntResDto(HttpStatus.OK,"login success",prinpalDetails.member))
-
        responseData(response,jsonResult)
-
     }
 }

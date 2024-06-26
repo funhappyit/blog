@@ -1,6 +1,7 @@
 package com.example.blog.config.security
 
 import com.auth0.jwt.exceptions.TokenExpiredException
+import com.example.blog.domain.InMemoryRepository
 import com.example.blog.domain.member.MemberRepository
 import com.example.blog.util.CookieProvider
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -16,6 +17,7 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 class CustomBasicAuthenticationFilter(
     private val memberRepository: MemberRepository,
+    private val memoryRepository: InMemoryRepository,
     private val om: ObjectMapper,
     authenticationManager: AuthenticationManager
 ): BasicAuthenticationFilter(authenticationManager) {
@@ -49,8 +51,9 @@ class CustomBasicAuthenticationFilter(
                 }
 
 
-                val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
-                val details = om.readValue(principalString, PrincipalDetails::class.java)
+               // val principalString = jwtManager.getPrincipalStringByRefreshToken(refreshToken)
+                val details = memoryRepository.findByKey(refreshToken) as PrincipalDetails
+                //val details = om.readValue(principal, PrincipalDetails::class.java)
 
                 reissueAccessToken(details, response)
                 setAuthentication(details, chain, request, response)
